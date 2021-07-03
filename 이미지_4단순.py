@@ -1,19 +1,24 @@
 from PIL import Image
 import imutils
 
+import os
 import numpy as np
 import cv2
 
 
 
 
+
 def trans2ascii(count):
-    img = Image.open("frame%d.jpg" % count)
-    img_small = img.resize((64, 64), Image.LANCZOS)
-    img_black = img_small.convert('L')
+
+    
+    #img = cv2.imread("frame%d.jpg" % count, cv2.IMREAD_GRAYSCALE)
+    img = cv2.cvtColor(count, cv2.COLOR_BGR2GRAY)
+    img_small = cv2.resize(img, dsize=(80, 80), interpolation=cv2.INTER_LINEAR)
+    #img_black = img_small.convert('L')
 
 
-    pix = np.array(img_black)
+    pix = np.array(img_small)
 
     count=0
     ascii_image =[]
@@ -45,23 +50,33 @@ def trans2ascii(count):
 
     
 
-url = input()
-
 #Get video
-vidcap = cv2.VideoCapture(r"C:\Users\t\Desktop\사장님의 개그.mp4")
+video_url = input("경로를 내놔")
+vidcap = cv2.VideoCapture(video_url)
+#fourcc = cv2.VideoWriter_fourcc(*'MP4V')
 
+#cv2.VideoWriter("reduce_video.mp4", fourcc, 10.0,(64, 64), False)
+
+#vidcap = cv2.VideoCapture("reduce_video.mp4")
+
+if not vidcap.isOpened():
+    print('File open failed!')
+    cap.release()
+    sys.exit()
 
 count = int(0)
 
 while(vidcap.isOpened()):
+
     ret, image = vidcap.read()
     
     if(ret):
         #resize_image = imutils.resize(image, width=64, height=64)
         #gray = cv2.cvtColor(resize_image, cv2.COLOR_BGR2GRAY)
-        cv2.imwrite("frame%d.jpg" % count, image)
 
-        trans2ascii(count)
+        #cv2.imwrite("frame%d.jpg" % count, image)
+
+        trans2ascii(image)
         
 
     #cv2.imwrite("\images\fream"+(count)+".jpg", image)
@@ -70,8 +85,6 @@ while(vidcap.isOpened()):
         
     else:
         break
-
-
 
 
 
