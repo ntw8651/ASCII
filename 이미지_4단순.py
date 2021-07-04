@@ -1,12 +1,10 @@
 from PIL import Image
 import imutils
-
+from tkinter import *
+from tkinter import filedialog
 import os
 import numpy as np
 import cv2
-
-
-
 
 
 def trans2ascii(count):
@@ -14,7 +12,7 @@ def trans2ascii(count):
     
     #img = cv2.imread("frame%d.jpg" % count, cv2.IMREAD_GRAYSCALE)
     img = cv2.cvtColor(count, cv2.COLOR_BGR2GRAY)
-    img_small = cv2.resize(img, dsize=(80, 80), interpolation=cv2.INTER_LINEAR)
+    img_small = cv2.resize(img, dsize=(64, 64), interpolation=cv2.INTER_LINEAR)
     #img_black = img_small.convert('L')
 
 
@@ -51,41 +49,45 @@ def trans2ascii(count):
     
 
 #Get video
-video_url = input("경로를 내놔")
-vidcap = cv2.VideoCapture(video_url)
-#fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-
-#cv2.VideoWriter("reduce_video.mp4", fourcc, 10.0,(64, 64), False)
-
-#vidcap = cv2.VideoCapture("reduce_video.mp4")
-
-if not vidcap.isOpened():
-    print('File open failed!')
-    cap.release()
-    sys.exit()
-
-count = int(0)
-
-while(vidcap.isOpened()):
-
-    ret, image = vidcap.read()
+def select():
+    global file_path
+    file_path = filedialog.askopenfilename(parent=root,initialdir="/",title="선택해!!!!!")
     
-    if(ret):
-        #resize_image = imutils.resize(image, width=64, height=64)
-        #gray = cv2.cvtColor(resize_image, cv2.COLOR_BGR2GRAY)
+    
+def transVideo():
+    video_url = file_path
+    
+    vidcap = cv2.VideoCapture(video_url)
 
-        #cv2.imwrite("frame%d.jpg" % count, image)
+    if not vidcap.isOpened():
+        print('File open failed!')
+        cap.release()
+        sys.exit()
 
-        trans2ascii(image)
+
+    while(vidcap.isOpened()):
+        ret, image = vidcap.read()
         
+        if(ret):
+            trans2ascii(image)
+        else:
+            break
 
-    #cv2.imwrite("\images\fream"+(count)+".jpg", image)
-    #print('asdf')
-        count+=1
-        
-    else:
-        break
 
+
+filepath = str()
+root = Tk()
+
+
+
+lbl = Label(root, text="input video")
+lbl.pack()
+btn = Button(root, text="select", command = select)
+btn.pack()
+btn = Button(root, text="trans", command = transVideo)
+btn.pack()
+
+root.mainloop()
 
 
 
