@@ -1,13 +1,32 @@
-from PIL import Image
+import inspect
+
+#이미지 영상
 import imutils
-from tkinter import *
-from tkinter import filedialog
-import os
-import numpy as np
 import cv2
 
 
-def trans2ascii(count):
+
+#GUI
+from tkinter import *
+from tkinter import filedialog
+
+#PIL
+import PIL
+from PIL import Image, ImageDraw, ImageFont
+
+#그외
+import os
+import glob
+import numpy as np
+import textwrap
+import natsort #pip install natsort
+
+
+
+
+
+
+def trans2ascii(count, number):
 
     
     #img = cv2.imread("frame%d.jpg" % count, cv2.IMREAD_GRAYSCALE)
@@ -40,18 +59,41 @@ def trans2ascii(count):
     for i in ascii_image:
         render_image += str(''.join(i))+'\n'
 
+    make_picture(ascii_image, number)
 
 
-    print(render_image)
-
-
-
+    #print(render_image)
     
+    
+
+
+
+def make_picture(text, number):
+    image = Image.new("RGB", (640, 1090), color =(255,255,255))
+    fnt = ImageFont.truetype("VeraMono.ttf", 17)
+    
+    textPosX = 0
+    textPosY = 0
+    count = 0
+
+    text_info = []
+    for i in text:
+        text_info.append(str(''.join(i)))
+                         
+    dImage = ImageDraw.Draw(image)
+    for p in text_info:
+        dImage.text((textPosX,count*17), str(p), font=fnt, fill=(0, 0, 0))
+        count+=1
+    
+    image.save('asciiImage\\'+str(number)+'.jpg')
+    print('now:'+str(number))
+
+
 
 #Get video
 def select():
     global file_path
-    file_path = filedialog.askopenfilename(parent=root,initialdir="/",title="선택해!!!!!")
+    file_path = filedialog.askopenfilename(parent=root,initialdir=os.getcwd(),title="선택해!!!!!")
     
     
 def transVideo():
@@ -64,19 +106,44 @@ def transVideo():
         cap.release()
         sys.exit()
 
+    number = 1
 
     while(vidcap.isOpened()):
         ret, image = vidcap.read()
         
         if(ret):
-            trans2ascii(image)
+            global fps
+            fps = vidcap.get(cv2.CAP_PROP_FPS)
+            trans2ascii(image, number)
+            number+=1
         else:
             break
 
+def videoCreate(fps):
+    img_array = []
+    
+    print()
+    for filename in natsort.natsorted((glob.glob('asciiImage\*.jpg'))):
 
+        img = cv2.imread(filename)
+        height, width, layers = img.shape
+        size = (width, height)
+        img_array.append(img)
 
+    out = cv2.VideoWriter('asciiVideo.avi', cv2.VideoWriter_fourcc(*'DIVX'), fps, (640, 1090))
+
+    for i in range(len(img_array)):
+        out.write(img_array[i])
+    out.release()
+    print("OK!!! File name is asciiVideo.avi")
+    
+#asdf = np.empty(shape, dtype=np.unit8)
+
+fps = 30.0
+#기본 fps
 filepath = str()
 root = Tk()
+
 
 
 
@@ -84,12 +151,13 @@ lbl = Label(root, text="input video")
 lbl.pack()
 btn = Button(root, text="select", command = select)
 btn.pack()
-btn = Button(root, text="trans", command = transVideo)
+btn = Button(root, text="Trans to Ascii", command = transVideo)
 btn.pack()
-
+btn = Button(root, text="Create Video", command = lambda: videoCreate(fps))
+btn.pack()
 root.mainloop()
 
-
+#
 
 
 #어쨋든 한 컷으로다가 저장이 되었으니깐 이걸 다시 영상으로 만드는 그런것도 있어야겠
