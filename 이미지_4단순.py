@@ -3,7 +3,7 @@ import inspect
 #이미지 영상
 import imutils
 import cv2
-
+import imageio
 
 
 #GUI
@@ -130,13 +130,16 @@ def videoCreate(fps):
         size = (width, height)
         img_array.append(img)
 
-    out = cv2.VideoWriter('asciiVideo.avi', cv2.VideoWriter_fourcc(*'DIVX'), fps, (640, 1090))
+    out = cv2.VideoWriter('asciiVideo.gif', cv2.VideoWriter_fourcc(*'DIVX'), fps, (640, 1090))
 
     for i in range(len(img_array)):
         out.write(img_array[i])
     out.release()
     print("OK!!! File name is asciiVideo.avi")
-    
+
+def gifCreate(fps):
+    img, *imgs = [Image.open(f) for f in natsort.natsorted((glob.glob('asciiImage\*.jpg')))]
+    img.save("asciiGif.gif", format="GIF", append_images=imgs, save_all=True, duration=1000%fps,loop=0)
 #asdf = np.empty(shape, dtype=np.unit8)
 
 fps = 30.0
@@ -144,9 +147,14 @@ fps = 30.0
 filepath = str()
 root = Tk()
 
+#이럴때가 가장 행복해ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
+#앜ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ이거지ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
+#ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ
+#어 근데 duration이면 지연아닌가?
+#그럼 1sec / fps로 해야하나?
+#대충 그렇네 그럼.. 보통 저런건 1s당 1000ms니깐 1000/fps하면 되려나?
 
-
-
+#나... 너무 똑똑해...아....
 lbl = Label(root, text="input video")
 lbl.pack()
 btn = Button(root, text="select", command = select)
@@ -155,6 +163,9 @@ btn = Button(root, text="Trans to Ascii", command = transVideo)
 btn.pack()
 btn = Button(root, text="Create Video", command = lambda: videoCreate(fps))
 btn.pack()
+btn = Button(root, text="Create Gif", command = lambda: gifCreate(fps))
+btn.pack()
+
 root.mainloop()
 
 #
